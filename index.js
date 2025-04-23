@@ -29,6 +29,21 @@ async function run() {
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
+
+    const salahCollection = client.db("LefeNest").collection("salah-info");
+
+
+    app.post('/salah-data', async(req, res)=>{
+        const {email, date, salahData} = req.body;
+        const existData = await salahCollection.findOne({email,date});
+        if(existData){
+            return res.status(409).json({ message: "Salah data already recorded for today." });
+        }
+        const result = await salahCollection.insertOne({ email, date, salahData });
+        console.log(result)
+        res.send(result)
+    })
+
   } finally {
     // Ensures that the client will close when you finish/error
    
