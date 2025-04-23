@@ -33,6 +33,7 @@ async function run() {
     const salahCollection = client.db("LefeNest").collection("salah-info");
 
 
+    // store salah data
     app.post('/salah-data', async(req, res)=>{
         const {email, date, salahData} = req.body;
         const existData = await salahCollection.findOne({email,date});
@@ -43,6 +44,15 @@ async function run() {
         console.log(result)
         res.send(result)
     })
+
+    // get salah data
+    app.get('/salah-data', async(req,res)=>{
+        const {email} = req.query;
+        const result = await salahCollection.find({email}).toArray()
+        res.send(result);
+
+    })
+
 
   } finally {
     // Ensures that the client will close when you finish/error
