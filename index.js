@@ -4,7 +4,13 @@ const app = express()
 const cors = require('cors')
 const port = process.env.PORT || 3000
 
-app.use(cors())
+// middleware
+const corsOptions = {
+    origin: ['https://lifenest-cac1e.web.app', 'http://localhost:5173'],
+    credentials: true,
+    optionSuccessStatus: 200,
+  }
+  app.use(cors(corsOptions))
 app.use(express.json())
 
 
@@ -25,10 +31,10 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
     const salahCollection = client.db("LefeNest").collection("salah-info");
 
@@ -52,6 +58,17 @@ async function run() {
         res.send(result);
 
     })
+
+    app.get("/salah-data/today", async (req, res) => {
+        const { email, date } = req.query;
+        const salahEntry = await salahCollection.findOne({ email, date });
+        if (salahEntry) {
+          res.json({ exists: true, salahData: salahEntry.salahData });
+        } else {
+          res.json({ exists: false });
+        }
+      });
+      
 
 
   } finally {
