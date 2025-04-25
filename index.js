@@ -6,7 +6,7 @@ const port = process.env.PORT || 3000
 
 // middleware
 const corsOptions = {
-    origin: ['https://lifenest-cac1e.web.app', 'http://localhost:5173'],
+    origin: ['https://lifenest-cac1e.web.app', 'http://localhost:5173', 'http://localhost:5174'],
     credentials: true,
     optionSuccessStatus: 200,
   }
@@ -37,6 +37,8 @@ async function run() {
     // console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
     const salahCollection = client.db("LefeNest").collection("salah-info");
+    const goalsCollection = client.db("LefeNest").collection("goal-info");
+  
 
 
     // store salah data
@@ -68,6 +70,29 @@ async function run() {
           res.json({ exists: false });
         }
       });
+
+      
+// POST daily goals
+app.post("/daily-goals", async (req, res) => {
+    const { email, date, goals } = req.body;
+  
+    const exist = await goalsCollection.findOne({ email, date });
+    if (exist) {
+      return res.status(409).send({ message: "Already submitted goals today." });
+    }
+  
+    const result = await goalsCollection.insertOne({ email, date, goals });
+    res.send(result);
+  });
+  
+  // GET daily goals
+  app.get("/daily-goals", async (req, res) => {
+    const { email, date } = req.query;
+    const result = await goalsCollection.findOne({ email, date });
+    res.send(result || {});
+  });
+  
+  
       
 
 
