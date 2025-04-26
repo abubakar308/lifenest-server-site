@@ -38,6 +38,7 @@ async function run() {
 
     const salahCollection = client.db("LefeNest").collection("salah-info");
     const goalsCollection = client.db("LefeNest").collection("goal-info");
+    const journalCollection = client.db("LefeNest").collection("journal-info");
   
 
 
@@ -71,7 +72,7 @@ async function run() {
         }
       });
 
-      
+
 // POST daily goals
 app.post("/daily-goals", async (req, res) => {
     const { email, date, goals } = req.body;
@@ -94,7 +95,23 @@ app.post("/daily-goals", async (req, res) => {
   
   
       
-
+// journal post
+app.post("/journal", async (req, res) => {
+    try {
+      const data = req.body;
+  
+      if (!data || !data.email || !data.date || !data.entry) {
+        return res.status(400).json({ message: "Invalid journal data." });
+      }
+  
+      const result = await journalCollection.insertOne(data);
+      res.status(201).send(result);
+    } catch (error) {
+      console.error("Error inserting journal:", error);
+      res.status(500).json({ message: "Failed to save journal entry." });
+    }
+  });
+  
 
   } finally {
     // Ensures that the client will close when you finish/error
