@@ -97,22 +97,19 @@ app.post("/daily-goals", async (req, res) => {
       
 // journal post
 app.post("/journal", async (req, res) => {
-    try {
       const data = req.body;
-  
-      if (!data || !data.email || !data.date || !data.entry) {
-        return res.status(400).json({ message: "Invalid journal data." });
-      }
-  
+
       const result = await journalCollection.insertOne(data);
-      res.status(201).send(result);
-    } catch (error) {
-      console.error("Error inserting journal:", error);
-      res.status(500).json({ message: "Failed to save journal entry." });
-    }
+      res.send(result);
   });
   
 
+  app.post("/feedback", async (req, res) => {
+    const feedback = req.body;
+    const result = await feedbackCollection.insertOne(feedback);
+    res.send(result);
+  });
+  
   } finally {
     // Ensures that the client will close when you finish/error
    
